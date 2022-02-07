@@ -2,13 +2,13 @@ extends KinematicBody2D
 
 
 # Movement constants
-const SPEED: int = 500
+export var speed: int = 500
 const JUMP_FORCE: int = 600
-const GRAVITY: int = 800
+const GRAVITY: int = 900
 
 # Movement properties
 var vel: Vector2 = Vector2()
-var isOnGround: bool = false
+var priorXVel: int
 
 onready var sprite = $AnimatedSprite
 
@@ -18,30 +18,40 @@ func _ready():
 	pass # Replace with function body.
 
 func _physics_process(delta):
-	# reset horizontal velocity
+	handle_input(delta)
+	handle_physics(delta)
+
+func handle_input(delta):
+	priorXVel = vel.x
 	vel.x = 0
+	
 	# movement inputs
 	if Input.is_action_pressed("move_left"):
-		vel.x -= SPEED
+		vel.x -= speed
 	if Input.is_action_pressed("move_right"):
-		vel.x += SPEED
+		vel.x += speed
 		
-	# applying the velocity
-	vel = move_and_slide(vel, Vector2.UP)
+	# jump input
+	if Input.is_action_pressed("jump"):
+		if is_on_floor():
+			vel.y -= JUMP_FORCE
+		if is_on_wall():
+			#wall jump
+			pass
 	
-	
+func handle_physics(delta):
 	# gravity
 	vel.y += GRAVITY * delta
-	# jump input
-	if Input.is_action_pressed("jump") and is_on_floor():
-		vel.y -= JUMP_FORCE
 		
+	if !is_on_floor():
+		vel.x = priorXVel
+
 	# sprite direction
 	if vel.x < 0:
 		sprite.flip_h = true
 	elif vel.x > 0:
 		sprite.flip_h = false
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+		
+	# applying the velocity
+	vel = move_and_slide(vel, Vector2.UP)
+	
