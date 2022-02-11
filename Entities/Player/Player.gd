@@ -1,10 +1,11 @@
 extends KinematicBody2D
 
+export var speed: int = 500
 
 # Movement constants
-export var speed: int = 500
-const JUMP_FORCE: int = 600
+const JUMP_FORCE: int = -600
 const GRAVITY: int = 900
+const WALL_SLIDE: int = 300
 
 # Movement properties
 var vel: Vector2 = Vector2()
@@ -18,11 +19,6 @@ func _ready():
 	pass # Replace with function body.
 
 func _physics_process(delta):
-	handle_input(delta)
-	handle_physics(delta)
-
-func handle_input(delta):
-	priorXVel = vel.x
 	vel.x = 0
 	
 	# movement inputs
@@ -32,18 +28,23 @@ func handle_input(delta):
 		vel.x += speed
 		
 	# jump input
-	if Input.is_action_pressed("jump"):
+	if Input.is_action_just_pressed("jump"):
 		if is_on_floor():
-			vel.y -= JUMP_FORCE
-		if is_on_wall():
-			#wall jump
-			pass
-	
-func handle_physics(delta):
+			vel.y = JUMP_FORCE
+		elif is_on_wall():
+			vel.y = JUMP_FORCE
+			priorXVel = -priorXVel
+			
 	# gravity
-	vel.y += GRAVITY * delta
+	if is_on_wall():
+		vel.y += WALL_SLIDE* delta
+	else:
+		vel.y += GRAVITY * delta
 		
-	if !is_on_floor():
+	# Momentum storage
+	if is_on_floor():
+		priorXVel = vel.x
+	else:
 		vel.x = priorXVel
 
 	# sprite direction
@@ -54,4 +55,5 @@ func handle_physics(delta):
 		
 	# applying the velocity
 	vel = move_and_slide(vel, Vector2.UP)
+	
 	
