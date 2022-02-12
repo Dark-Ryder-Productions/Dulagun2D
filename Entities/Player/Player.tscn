@@ -39,3 +39,6 @@ shape = SubResource( 1 )
 [node name="Collision-Feet" type="CollisionShape2D" parent="."]
 position = Vector2( 0, 51.25 )
 shape = SubResource( 3 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true

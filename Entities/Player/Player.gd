@@ -1,9 +1,8 @@
 extends KinematicBody2D
 
 export var speed: int = 500
-export var inAirSpeedModifier: float = 0.02
+export var in_air_speed_modifier: float = 0.02
 export var accel: float = 0.25
-export var friction: float = 0.1
 
 # Movement constants
 const JUMP_FORCE: int = -600
@@ -12,23 +11,33 @@ const WALL_SLIDE: int = 300
 
 # Movement properties
 var vel: Vector2 = Vector2()
-var priorXVel: float
-var isWallSliding: bool = false
+var prior_x_vel: float
+var is_wall_sliding: bool = false
+
+# Weapon constants
+const PISTOL = "pistol"
+
+# Weapon handling
+var aval_weapons = [ PISTOL ]
+var weapon_res_map = {
+	PISTOL: "res://Entities/Weapons/Pistol/Pistol.tscn"
+}
+var left_weapon = null
+var right_weapon = null
 
 onready var sprite = $AnimatedSprite
-
 
 func _ready():
 	pass 
 
 func _physics_process(delta):
-	vel.x = 0
+	var inputXVel = 0
 	
 	# movement inputs
 	if Input.is_action_pressed("move_left"):
-		vel.x -= 1
+		inputXVel = -1
 	if Input.is_action_pressed("move_right"):
-		vel.x += 1
+		inputXVel = 1
 		
 	# jump input
 	if Input.is_action_just_pressed("jump"):
@@ -36,22 +45,22 @@ func _physics_process(delta):
 			vel.y = JUMP_FORCE
 		elif is_on_wall():
 			vel.y = JUMP_FORCE
-			priorXVel = -priorXVel
+			prior_x_vel = -prior_x_vel
 			
 	# gravity
 	if is_on_wall():
-		if !isWallSliding:
+		if !is_wall_sliding:
 			# Cancel vertical velocity when player initially collides with a wall
 			vel.y = 0
 		vel.y += WALL_SLIDE* delta
-		isWallSliding = true
+		is_wall_sliding = true
 	else:
 		vel.y += GRAVITY * delta
-		isWallSliding = false
+		is_wall_sliding = false
 		
 	if is_on_floor():
 		# Momentum storage
-		priorXVel = vel.x
+		prior_x_vel = inputXVel
 		# sprite direction
 		if vel.x < 0:
 			sprite.flip_h = true
@@ -59,13 +68,11 @@ func _physics_process(delta):
 			sprite.flip_h = false
 	else:
 		# Provide player with limited control in the air
-		priorXVel = clamp((priorXVel + (vel.x * inAirSpeedModifier)), -1, 1)
-		vel.x = priorXVel
-
-	
+		prior_x_vel = clamp((prior_x_vel + (inputXVel * in_air_speed_modifier)), -1, 1)
+		inputXVel = prior_x_vel
 		
 	# applying the velocity
-	vel.x *= speed
+	vel.x = lerp(vel.x, inputXVel * speed, accel)
 	vel = move_and_slide(vel, Vector2.UP)
 	
 	
