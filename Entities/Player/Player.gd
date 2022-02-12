@@ -1,15 +1,17 @@
 extends KinematicBody2D
 
 export var speed: int = 500
+export var inAirSpeed: int = 200
 
 # Movement constants
 const JUMP_FORCE: int = -600
-const GRAVITY: int = 900
+const GRAVITY: int = 1200
 const WALL_SLIDE: int = 300
 
 # Movement properties
 var vel: Vector2 = Vector2()
 var priorXVel: int
+var isWallSliding: bool = false
 
 onready var sprite = $AnimatedSprite
 
@@ -24,8 +26,12 @@ func _physics_process(delta):
 	# movement inputs
 	if Input.is_action_pressed("move_left"):
 		vel.x -= speed
+		if !is_on_floor():
+			vel.x -= clamp(inAirSpeed, -speed, inAirSpeed)
 	if Input.is_action_pressed("move_right"):
 		vel.x += speed
+		if !is_on_floor():
+			vel.x += clamp(inAirSpeed, inAirSpeed, speed)
 		
 	# jump input
 	if Input.is_action_just_pressed("jump"):
@@ -37,14 +43,19 @@ func _physics_process(delta):
 			
 	# gravity
 	if is_on_wall():
+		if !isWallSliding:
+			# Cancel vertical velocity when player initially collides with a wall
+			vel.y = 0
 		vel.y += WALL_SLIDE* delta
+		isWallSliding = true
 	else:
 		vel.y += GRAVITY * delta
+		isWallSliding = false
 		
 	# Momentum storage
 	if is_on_floor():
 		priorXVel = vel.x
-	else:
+	elif vel.x == 0:
 		vel.x = priorXVel
 
 	# sprite direction
