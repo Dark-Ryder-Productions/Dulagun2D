@@ -25,6 +25,9 @@ var weapon_res_map = {
 var left_weapon = null
 var right_weapon = null
 
+signal l_fire
+signal r_fire
+
 onready var sprite = $AnimatedSprite
 
 func _ready():
@@ -47,9 +50,20 @@ func _physics_process(delta):
 			vel.y = JUMP_FORCE
 			prior_x_vel = -prior_x_vel
 			
+	# Firing weapons
+	if Input.is_action_just_pressed("fire_left_gun"):
+		emit_signal("l_fire")
+	if Input.is_action_just_pressed("fire_right_gun"):
+		emit_signal("r_fire")
+			
+	# Weapon swtiching input
+	if Input.is_action_just_pressed("equip_pistols"):
+		switch_both_weapons(PISTOL)
+			
 	# gravity
 	if is_on_wall():
 		if !is_wall_sliding:
+			print("Sliding")
 			# Cancel vertical velocity when player initially collides with a wall
 			vel.y = 0
 		vel.y += WALL_SLIDE* delta
@@ -75,4 +89,43 @@ func _physics_process(delta):
 	vel.x = lerp(vel.x, inputXVel * speed, accel)
 	vel = move_and_slide(vel, Vector2.UP)
 	
+###
+# Switch both left and right weapons
+###
+func switch_both_weapons(weaponName: String):
+	switch_weapon(weaponName, true)
+	switch_weapon(weaponName, false)
 	
+###
+# Switch a weapon for a given hand
+###
+func switch_weapon(weaponName: String, isLeft: bool):
+	unequip_weapon(isLeft)
+	equip_weapon(weaponName, isLeft)
+	
+###
+# Equip a weapon for a given hand. Assumes currently none equiped
+###
+func equip_weapon(weaponName: String, isLeft: bool):
+	if (isLeft and left_weapon != null) or (!isLeft and right_weapon != null):
+		return
+		
+	var scene = load(weapon_res_map[weaponName])
+	var weapon = scene.instance()
+	
+	self.connect(("l_fire" if isLeft else "r_fire"), weapon, "fire")	
+	weapon.is_left = isLeft
+	if isLeft:
+		get_node("AnimatedSprite/Arm-Left").add_child(weapon)
+		left_weapon = weapon
+	else: 
+		get_node("AnimatedSprite/Arm-Right").add_child(weapon)
+		right_weapon = weapon
+	
+	
+###
+# Unequip a current weapon for a given hand
+###
+func unequip_weapon(isLeft: bool):
+	if (isLeft and left_weapon == null) or (!isLeft and right_weapon == null):
+		return
