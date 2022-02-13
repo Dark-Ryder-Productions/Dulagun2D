@@ -1,6 +1,7 @@
 extends KinematicBody2D
 
 export var speed: int = 500
+export var sprint_speed: int = 900
 export var in_air_speed_modifier: float = 0.02
 export var accel: float = 0.25
 
@@ -35,8 +36,9 @@ func _ready():
 
 func _physics_process(delta):
 	var inputXVel = 0
+	var isSprinting: bool = false
 	
-	# movement inputs
+	# Movement inputs
 	if Input.is_action_pressed("move_left"):
 		inputXVel = -1
 	if Input.is_action_pressed("move_right"):
@@ -50,6 +52,12 @@ func _physics_process(delta):
 			vel.y = JUMP_FORCE
 			prior_x_vel = -prior_x_vel
 			
+	if Input.is_action_pressed("sprint"):
+		isSprinting = true
+		
+	if Input.is_action_just_pressed("slide"):
+		pass # Add this later
+			
 	# Firing weapons
 	if Input.is_action_just_pressed("fire_left_gun"):
 		emit_signal("l_fire")
@@ -59,6 +67,10 @@ func _physics_process(delta):
 	# Weapon swtiching input
 	if Input.is_action_just_pressed("equip_pistols"):
 		switch_both_weapons(PISTOL)
+		
+	if Input.is_action_just_pressed("unequip_weapons"):
+		unequip_weapon(true)
+		unequip_weapon(false)
 			
 	# gravity
 	if is_on_wall():
@@ -86,7 +98,8 @@ func _physics_process(delta):
 		inputXVel = prior_x_vel
 		
 	# applying the velocity
-	vel.x = lerp(vel.x, inputXVel * speed, accel)
+	var moveSpeed = sprint_speed if isSprinting else speed
+	vel.x = lerp(vel.x, inputXVel * moveSpeed, accel)
 	vel = move_and_slide(vel, Vector2.UP)
 	
 ###
@@ -109,7 +122,7 @@ func switch_weapon(weaponName: String, isLeft: bool):
 func equip_weapon(weaponName: String, isLeft: bool):
 	if (isLeft and left_weapon != null) or (!isLeft and right_weapon != null):
 		return
-		
+	
 	var scene = load(weapon_res_map[weaponName])
 	var weapon = scene.instance()
 	
@@ -129,3 +142,10 @@ func equip_weapon(weaponName: String, isLeft: bool):
 func unequip_weapon(isLeft: bool):
 	if (isLeft and left_weapon == null) or (!isLeft and right_weapon == null):
 		return
+		
+	if isLeft:
+		left_weapon.queue_free()
+		left_weapon = null
+	else:
+		right_weapon.queue_free()
+		right_weapon = null
