@@ -18,5 +18,5 @@ func fire():
 	var bulletScene = load("res://Entities/Weapons/Bullet/Bullet.tscn")
 	var bullet = bulletScene.instance()
 	
-	add_child(bullet)
-	bullet.transform = $Muzzle.transform
+	get_parent().add_child(bullet)
+	bullet.global_transform = $Muzzle.global_transform

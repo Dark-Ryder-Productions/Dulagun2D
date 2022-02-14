@@ -73,12 +73,11 @@ func _physics_process(delta):
 		unequip_weapon(false)
 			
 	# gravity
-	if is_on_wall():
+	if is_on_wall() and !is_on_floor():
 		if !is_wall_sliding:
-			print("Sliding")
 			# Cancel vertical velocity when player initially collides with a wall
 			vel.y = 0
-		vel.y += WALL_SLIDE* delta
+		vel.y += (WALL_SLIDE * delta)
 		is_wall_sliding = true
 	else:
 		vel.y += GRAVITY * delta
