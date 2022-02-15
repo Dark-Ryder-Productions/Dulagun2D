@@ -37,6 +37,19 @@ position = Vector2( 501.5, 446.5 )
 scale = Vector2( 0.484863, 151 )
 texture = SubResource( 2 )
 
+[node name="StaticBody2D5" type="StaticBody2D" parent="."]
+position = Vector2( 1888, 190 )
+scale = Vector2( 1.76, 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D5"]
+position = Vector2( 503, 445 )
+shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="StaticBody2D5"]
+position = Vector2( 501.5, 446.5 )
+scale = Vector2( 0.484863, 151 )
+texture = SubResource( 2 )
+
 [node name="StaticBody2D2" type="StaticBody2D" parent="."]
 position = Vector2( 1381, 998 )
 rotation = -1.56673
@@ -46,6 +59,19 @@ position = Vector2( 503, 445 )
 shape = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="StaticBody2D2"]
+position = Vector2( 501.5, 446.5 )
+scale = Vector2( 0.484863, 151 )
+texture = SubResource( 2 )
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="."]
+position = Vector2( 893, 691 )
+rotation = -1.56673
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4"]
+position = Vector2( 503, 445 )
+shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="StaticBody2D4"]
 position = Vector2( 501.5, 446.5 )
 scale = Vector2( 0.484863, 151 )
 texture = SubResource( 2 )

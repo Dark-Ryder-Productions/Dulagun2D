@@ -29,7 +29,7 @@ var right_weapon = null
 onready var sprite = $AnimatedSprite
 
 func _ready():
-	pass 
+	pass
 
 func _physics_process(delta):
 	var inputXVel = 0
@@ -85,35 +85,65 @@ func _physics_process(delta):
 	if is_on_floor():
 		# Momentum storage
 		prior_x_vel = inputXVel
-		# sprite direction
-		if inputXVel < 0:
-			sprite.flip_h = true
-		elif inputXVel > 0:
-			sprite.flip_h = false
 	else:
 		# Provide player with limited control in the air
 		prior_x_vel = clamp((prior_x_vel + (inputXVel * in_air_speed_modifier)), -1, 1)
 		inputXVel = prior_x_vel
 		
+	handle_sprite_direction()
+	
 	# applying the velocity
 	var moveSpeed = sprint_speed if isSprinting else speed
 	vel.x = lerp(vel.x, inputXVel * moveSpeed, accel)
 	vel = move_and_slide(vel, Vector2.UP)
 	
+# Region: Sprite handling ------------------------------------------------------
+###
+# Determine which direction the sprites should be facing
+###
+func handle_sprite_direction():
+	# sprite direction
+	if get_global_mouse_position().x < global_position.x:
+		flip_sprites(true)
+		set_arm_z_index(1, -1)
+	else:
+		flip_sprites(false)
+		set_arm_z_index(-1, 1)
+
+###
+# Flip the player's main sprite horizontally and the weapon sprites vertically
+###
+func flip_sprites(flip: bool):
+	sprite.flip_h = flip
+	if left_weapon != null:
+		left_weapon.get_node("AnimatedSprite").flip_v = flip
+	if right_weapon != null:
+		right_weapon.get_node("AnimatedSprite").flip_v = flip
+
+###
+# Alter the z-index properties of the left and right arm
+###
+func set_arm_z_index(leftIndex: int, rightIndex: int):
+	$"AnimatedSprite/Arm-Left".z_index = leftIndex
+	$"AnimatedSprite/Arm-Right".z_index = rightIndex
+
+# End Region
+# Region: Weapon Handling ------------------------------------------------------
+
 ###
 # Switch both left and right weapons
 ###
 func switch_both_weapons(weaponName: String):
 	switch_weapon(weaponName, true)
 	switch_weapon(weaponName, false)
-	
+
 ###
 # Switch a weapon for a given hand
 ###
 func switch_weapon(weaponName: String, isLeft: bool):
 	unequip_weapon(isLeft)
 	equip_weapon(weaponName, isLeft)
-	
+
 ###
 # Equip a weapon for a given hand. Assumes currently none equiped
 ###
@@ -132,7 +162,6 @@ func equip_weapon(weaponName: String, isLeft: bool):
 		get_node("AnimatedSprite/Arm-Right").add_child(weapon)
 		right_weapon = weapon
 	
-	
 ###
 # Unequip a current weapon for a given hand
 ###
@@ -146,3 +175,5 @@ func unequip_weapon(isLeft: bool):
 	else:
 		right_weapon.queue_free()
 		right_weapon = null
+
+# End Region
