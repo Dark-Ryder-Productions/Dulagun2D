@@ -26,9 +26,6 @@ var weapon_res_map = {
 var left_weapon = null
 var right_weapon = null
 
-signal l_fire
-signal r_fire
-
 onready var sprite = $AnimatedSprite
 
 func _ready():
@@ -60,9 +57,11 @@ func _physics_process(delta):
 			
 	# Firing weapons
 	if Input.is_action_just_pressed("fire_left_gun"):
-		emit_signal("l_fire")
+		if left_weapon != null:
+			left_weapon.fire()
 	if Input.is_action_just_pressed("fire_right_gun"):
-		emit_signal("r_fire")
+		if right_weapon != null:
+			right_weapon.fire()
 			
 	# Weapon swtiching input
 	if Input.is_action_just_pressed("equip_pistols"):
@@ -87,9 +86,9 @@ func _physics_process(delta):
 		# Momentum storage
 		prior_x_vel = inputXVel
 		# sprite direction
-		if vel.x < 0:
+		if inputXVel < 0:
 			sprite.flip_h = true
-		elif vel.x > 0:
+		elif inputXVel > 0:
 			sprite.flip_h = false
 	else:
 		# Provide player with limited control in the air
@@ -125,7 +124,6 @@ func equip_weapon(weaponName: String, isLeft: bool):
 	var scene = load(weapon_res_map[weaponName])
 	var weapon = scene.instance()
 	
-	self.connect(("l_fire" if isLeft else "r_fire"), weapon, "fire")	
 	weapon.is_left = isLeft
 	if isLeft:
 		get_node("AnimatedSprite/Arm-Left").add_child(weapon)
