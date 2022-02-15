@@ -17,11 +17,13 @@ var is_wall_sliding: bool = false
 
 # Weapon constants
 const PISTOL = "pistol"
+const UNARMED = "unarmed"
 
 # Weapon handling
-var aval_weapons = [ PISTOL ]
+var aval_weapons = [ PISTOL, UNARMED ]
 var weapon_res_map = {
-	PISTOL: "res://Entities/Weapons/Pistol/Pistol.tscn"
+	PISTOL: "res://Entities/Weapons/Pistol/Pistol.tscn",
+	UNARMED: "res://Entities/Weapons/Unarmed/Unarmed.tscn"
 }
 var left_weapon = null
 var right_weapon = null
@@ -29,7 +31,7 @@ var right_weapon = null
 onready var sprite = $AnimatedSprite
 
 func _ready():
-	pass
+	switch_both_weapons(UNARMED)
 
 func _physics_process(delta):
 	var inputXVel = 0
@@ -68,8 +70,7 @@ func _physics_process(delta):
 		switch_both_weapons(PISTOL)
 		
 	if Input.is_action_just_pressed("unequip_weapons"):
-		unequip_weapon(true)
-		unequip_weapon(false)
+		switch_both_weapons(UNARMED)
 			
 	# gravity
 	if is_on_wall() and !is_on_floor():
@@ -148,7 +149,7 @@ func switch_weapon(weaponName: String, isLeft: bool):
 # Equip a weapon for a given hand. Assumes currently none equiped
 ###
 func equip_weapon(weaponName: String, isLeft: bool):
-	if (isLeft and left_weapon != null) or (!isLeft and right_weapon != null):
+	if (isLeft and left_weapon != null and left_weapon.TYPE == weaponName) or (!isLeft and right_weapon != null and right_weapon.TYPE == weaponName):
 		return
 	
 	var scene = load(weapon_res_map[weaponName])

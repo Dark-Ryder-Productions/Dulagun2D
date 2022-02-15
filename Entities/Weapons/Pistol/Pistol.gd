@@ -2,7 +2,8 @@ extends Node2D
 
 export var is_left: bool = false
 
-const TYPE: String = 'pistol'
+const NAME: String = "pistol"
+const TYPE: String = "gun"
 
 func _ready():
 	pass 
