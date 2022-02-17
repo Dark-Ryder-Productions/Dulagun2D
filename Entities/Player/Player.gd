@@ -13,6 +13,7 @@ const WALL_SLIDE: int = 300
 # Movement properties
 var vel: Vector2 = Vector2()
 var prior_x_vel: float
+var wall_jump_x_vel: float
 var is_wall_sliding: bool = false
 
 # Weapon constants
@@ -49,7 +50,7 @@ func _physics_process(delta):
 			vel.y = JUMP_FORCE
 		elif is_on_wall():
 			vel.y = JUMP_FORCE
-			prior_x_vel = -prior_x_vel
+			prior_x_vel = wall_jump_x_vel
 			
 	if Input.is_action_pressed("sprint"):
 		isSprinting = true
@@ -77,6 +78,8 @@ func _physics_process(delta):
 		if !is_wall_sliding:
 			# Cancel vertical velocity when player initially collides with a wall
 			vel.y = 0
+			wall_jump_x_vel = -prior_x_vel
+			prior_x_vel = 0
 		vel.y += (WALL_SLIDE * delta)
 		is_wall_sliding = true
 	else:
