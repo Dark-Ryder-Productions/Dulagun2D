@@ -21,7 +21,7 @@ radius = 22.0
 height = 78.0
 
 [sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 21.5, 5.75 )
+extents = Vector2( 22, 14.5 )
 
 [node name="Player" type="KinematicBody2D"]
 collision_layer = 2
@@ -49,8 +49,20 @@ position = Vector2( 1, -5 )
 shape = SubResource( 1 )
 
 [node name="Collision-Feet" type="CollisionShape2D" parent="."]
-position = Vector2( 0.5, 51.25 )
+position = Vector2( 1, 42.5 )
 shape = SubResource( 3 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
+
+[node name="Wall-Collision" type="Node2D" parent="."]
+
+[node name="LeftWall" type="RayCast2D" parent="Wall-Collision"]
+rotation = 1.5708
+scale = Vector2( 10, 0.5 )
+enabled = true
+
+[node name="RightWall" type="RayCast2D" parent="Wall-Collision"]
+rotation = -1.5708
+scale = Vector2( 10, 0.5 )
+enabled = true
