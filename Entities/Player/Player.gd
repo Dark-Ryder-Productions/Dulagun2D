@@ -18,12 +18,14 @@ var is_wall_sliding: bool = false
 
 # Weapon constants
 const PISTOL = "pistol"
+const SHOTGUN = "shotgun"
 const UNARMED = "unarmed"
 
 # Weapon handling
-var aval_weapons = [ PISTOL, UNARMED ]
+var aval_weapons = [ PISTOL, SHOTGUN, UNARMED ]
 var weapon_res_map = {
 	PISTOL: "res://Entities/Weapons/Pistol/Pistol.tscn",
+	SHOTGUN: "res://Entities/Weapons/Shotgun/Shotgun.tscn",
 	UNARMED: "res://Entities/Weapons/Unarmed/Unarmed.tscn"
 }
 var left_weapon = null
@@ -67,8 +69,16 @@ func _physics_process(delta):
 			right_weapon.fire()
 			
 	# Weapon swtiching input
+	if Input.is_action_pressed("weapon_wheels"):
+		Engine.time_scale = 0.3
+	else:
+		Engine.time_scale = 1
+	
 	if Input.is_action_just_pressed("equip_pistols"):
 		switch_both_weapons(PISTOL)
+		
+	if Input.is_action_just_pressed("equip_shotguns"):
+		switch_both_weapons(SHOTGUN)
 		
 	if Input.is_action_just_pressed("unequip_weapons"):
 		switch_both_weapons(UNARMED)

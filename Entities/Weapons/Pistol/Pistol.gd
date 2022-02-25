@@ -4,6 +4,7 @@ export var is_left: bool = false
 
 const NAME: String = "pistol"
 const TYPE: String = "gun"
+const IS_AUTO: bool = false
 
 func _ready():
 	pass 
@@ -20,4 +21,5 @@ func fire():
 	var bullet = bulletScene.instance()
 	
 	get_parent().add_child(bullet)
+	$Gunshot.play()
 	bullet.global_transform = $Muzzle.global_transform
