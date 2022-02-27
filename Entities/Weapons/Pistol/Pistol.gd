@@ -6,11 +6,13 @@ const NAME: String = "pistol"
 const TYPE: String = "gun"
 const IS_AUTO: bool = false
 
+var is_firing: bool = false
+
 func _ready():
 	pass 
 
 
-func _process(delta):
+func _process(_delta):
 	look_at(get_global_mouse_position())
 	
 ###

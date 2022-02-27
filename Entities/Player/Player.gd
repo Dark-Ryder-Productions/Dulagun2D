@@ -62,11 +62,9 @@ func _physics_process(delta):
 			
 	# Firing weapons
 	if Input.is_action_just_pressed("fire_left_gun"):
-		if left_weapon != null:
-			left_weapon.fire()
+		fire_weapon(left_weapon)
 	if Input.is_action_just_pressed("fire_right_gun"):
-		if right_weapon != null:
-			right_weapon.fire()
+		fire_weapon(right_weapon)
 			
 	# Weapon swtiching input
 	if Input.is_action_pressed("weapon_wheels"):
@@ -153,6 +151,20 @@ func set_arm_z_index(leftIndex: int, rightIndex: int) -> void:
 
 # End Region
 # Region: Weapon Handling ------------------------------------------------------
+
+###
+# Handle firing a weapon
+###
+func fire_weapon(weapon) -> void:
+	if weapon == null or !weapon.has_method("fire") or weapon.is_firing:
+		return
+		
+	weapon.is_firing = true
+	weapon.fire()
+	if "fire_rate" in weapon:
+		yield(get_tree().create_timer(weapon.fire_rate), "timeout")
+	if is_instance_valid(weapon):
+		weapon.is_firing = false
 
 ###
 # Switch both left and right weapons
