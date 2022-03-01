@@ -5,6 +5,12 @@ export var sprint_speed: int = 900
 export var in_air_speed_modifier: float = 0.02
 export var accel: float = 0.25
 
+# Sprite constants 
+const ARM_RIGHT_Y_STAND = -133
+const ARM_LEFT_Y_STAND = -137
+const ARM_RIGHT_Y_SLIDE = 10
+const ARM_LEFT_Y_SLIDE = 5
+
 # Movement constants
 const JUMP_FORCE: int = -600
 const GRAVITY: int = 1200
@@ -57,8 +63,12 @@ func _physics_process(delta):
 	if Input.is_action_pressed("sprint"):
 		isSprinting = true
 		
-	if Input.is_action_just_pressed("slide"):
-		pass # Add this later
+	# This is WIP, need to actually handle movement in sliding
+	if Input.is_action_pressed("slide"):
+		handle_slide_sprite_collision(true)
+	else:
+		handle_slide_sprite_collision(false)
+		
 			
 	# Firing weapons
 	if Input.is_action_just_pressed("fire_left_gun"):
@@ -149,6 +159,17 @@ func set_arm_z_index(leftIndex: int, rightIndex: int) -> void:
 	$"AnimatedSprite/Arm-Left".z_index = leftIndex
 	$"AnimatedSprite/Arm-Right".z_index = rightIndex
 
+###
+# Alter the player hitbox and sprite based on if sliding or not
+###
+func handle_slide_sprite_collision(isSliding):
+	$AnimatedSprite.play("slide" if isSliding else "default")
+	$"AnimatedSprite/Arm-Left".position.y = ARM_LEFT_Y_SLIDE if isSliding else ARM_LEFT_Y_STAND
+	$"AnimatedSprite/Arm-Right".position.y = ARM_RIGHT_Y_SLIDE if isSliding else ARM_RIGHT_Y_STAND
+	$"Collision-Body".disabled = isSliding
+	$"Slide-Body".disabled = !isSliding
+	$"Slide-Feet".disabled = !isSliding
+	
 # End Region
 # Region: Weapon Handling ------------------------------------------------------
 
