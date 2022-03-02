@@ -45,6 +45,7 @@ func _ready():
 func _physics_process(delta):
 	var inputXVel = 0
 	var isSprinting: bool = false
+	var isSliding: bool = false
 	
 	# Movement inputs
 	if Input.is_action_pressed("move_left"):
@@ -64,8 +65,9 @@ func _physics_process(delta):
 		isSprinting = true
 		
 	# This is WIP, need to actually handle movement in sliding
-	if Input.is_action_pressed("slide"):
+	if Input.is_action_pressed("slide") and is_on_floor():
 		handle_slide_sprite_collision(true)
+		isSliding = true
 	else:
 		handle_slide_sprite_collision(false)
 		
@@ -106,17 +108,20 @@ func _physics_process(delta):
 		is_wall_sliding = false
 		
 	if is_on_floor():
-		# Momentum storage
-		prior_x_vel = inputXVel
+		if isSliding:
+			inputXVel = prior_x_vel
+		else:
+			prior_x_vel = inputXVel
 	else:
 		# Provide player with limited control in the air
 		prior_x_vel = clamp((prior_x_vel + (inputXVel * in_air_speed_modifier)), -1, 1)
 		inputXVel = prior_x_vel
 		
+		
 	handle_sprite_direction()
 	
-	# applying the velocity
-	var moveSpeed = sprint_speed if isSprinting else speed
+	# applying the velocity		
+	var moveSpeed = sprint_speed if (isSprinting and !isSliding) else speed
 	vel.x = lerp(vel.x, inputXVel * moveSpeed, accel)
 	vel = move_and_slide(vel, Vector2.UP)
 	

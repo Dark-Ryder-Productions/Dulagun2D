@@ -42,7 +42,6 @@ script = ExtResource( 2 )
 position = Vector2( 4, -11 )
 scale = Vector2( 0.3, 0.3 )
 frames = SubResource( 2 )
-animation = "slide"
 
 [node name="Arm-Right" type="Node2D" parent="AnimatedSprite"]
 position = Vector2( -50, -133.333 )
