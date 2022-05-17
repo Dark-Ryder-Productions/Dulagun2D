@@ -43,8 +43,5 @@ margin_right = 507.029
 margin_bottom = 930.067
 custom_fonts/font = SubResource( 2 )
 text = "Test001"
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [connection signal="button_up" from="Button" to="." method="launchTestingArea"]

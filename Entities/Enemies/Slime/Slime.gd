@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
 export var gravity: int = 80
-export var speed: int = 10
+export var speed: int = 40
 export var health: int = 40
 
 var is_dead: bool = false

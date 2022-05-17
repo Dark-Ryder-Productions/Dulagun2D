@@ -21,6 +21,7 @@ var vel: Vector2 = Vector2()
 var prior_x_vel: float
 var wall_jump_x_vel: float
 var is_wall_sliding: bool = false
+var is_floor_sliding: bool = false
 
 # Weapon constants
 const PISTOL = "pistol"
@@ -68,8 +69,9 @@ func _physics_process(delta):
 	if Input.is_action_pressed("slide") and is_on_floor():
 		handle_slide_sprite_collision(true)
 		isSliding = true
-	else:
+	elif is_floor_sliding:
 		handle_slide_sprite_collision(false)
+		
 		
 			
 	# Firing weapons
@@ -80,9 +82,10 @@ func _physics_process(delta):
 			
 	# Weapon swtiching input
 	if Input.is_action_pressed("weapon_wheels"):
-		Engine.time_scale = 0.3
+		pass
 	else:
-		Engine.time_scale = 1
+		# We'll come back to this later
+		pass
 	
 	if Input.is_action_just_pressed("equip_pistols"):
 		switch_both_weapons(PISTOL)
@@ -174,6 +177,7 @@ func handle_slide_sprite_collision(isSliding):
 	$"Collision-Body".disabled = isSliding
 	$"Slide-Body".disabled = !isSliding
 	$"Slide-Feet".disabled = !isSliding
+	is_floor_sliding = isSliding
 	
 # End Region
 # Region: Weapon Handling ------------------------------------------------------
