@@ -21,7 +21,6 @@ var vel: Vector2 = Vector2()
 var prior_x_vel: float
 var wall_jump_x_vel: float
 var is_wall_sliding: bool = false
-var is_floor_sliding: bool = false
 
 # Weapon constants
 const PISTOL = "pistol"
@@ -46,7 +45,6 @@ func _ready():
 func _physics_process(delta):
 	var inputXVel = 0
 	var isSprinting: bool = false
-	var isSliding: bool = false
 	
 	# Movement inputs
 	if Input.is_action_pressed("move_left"):
@@ -64,15 +62,6 @@ func _physics_process(delta):
 			
 	if Input.is_action_pressed("sprint"):
 		isSprinting = true
-		
-	# This is WIP, need to actually handle movement in sliding
-	if Input.is_action_pressed("slide") and is_on_floor():
-		handle_slide_sprite_collision(true)
-		isSliding = true
-	elif is_floor_sliding:
-		handle_slide_sprite_collision(false)
-		
-		
 			
 	# Firing weapons
 	if Input.is_action_just_pressed("fire_left_gun"):
@@ -111,10 +100,7 @@ func _physics_process(delta):
 		is_wall_sliding = false
 		
 	if is_on_floor():
-		if isSliding:
-			inputXVel = prior_x_vel
-		else:
-			prior_x_vel = inputXVel
+		prior_x_vel = inputXVel
 	else:
 		# Provide player with limited control in the air
 		prior_x_vel = clamp((prior_x_vel + (inputXVel * in_air_speed_modifier)), -1, 1)
@@ -124,7 +110,7 @@ func _physics_process(delta):
 	handle_sprite_direction()
 	
 	# applying the velocity		
-	var moveSpeed = sprint_speed if (isSprinting and !isSliding) else speed
+	var moveSpeed = sprint_speed if isSprinting else speed
 	vel.x = lerp(vel.x, inputXVel * moveSpeed, accel)
 	vel = move_and_slide(vel, Vector2.UP)
 	
@@ -166,18 +152,6 @@ func flip_sprites(flip: bool) -> void:
 func set_arm_z_index(leftIndex: int, rightIndex: int) -> void:
 	$"AnimatedSprite/Arm-Left".z_index = leftIndex
 	$"AnimatedSprite/Arm-Right".z_index = rightIndex
-
-###
-# Alter the player hitbox and sprite based on if sliding or not
-###
-func handle_slide_sprite_collision(isSliding):
-	$AnimatedSprite.play("slide" if isSliding else "default")
-	$"AnimatedSprite/Arm-Left".position.y = ARM_LEFT_Y_SLIDE if isSliding else ARM_LEFT_Y_STAND
-	$"AnimatedSprite/Arm-Right".position.y = ARM_RIGHT_Y_SLIDE if isSliding else ARM_RIGHT_Y_STAND
-	$"Collision-Body".disabled = isSliding
-	$"Slide-Body".disabled = !isSliding
-	$"Slide-Feet".disabled = !isSliding
-	is_floor_sliding = isSliding
 	
 # End Region
 # Region: Weapon Handling ------------------------------------------------------
