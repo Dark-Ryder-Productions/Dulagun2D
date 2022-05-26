@@ -22,6 +22,10 @@ var prior_x_vel: float
 var wall_jump_x_vel: float
 var is_wall_sliding: bool = false
 
+# Menu properties
+var weapon_wheel = preload("res://Menus/InGameMenus/Weapons/WeaponWheel.tscn")
+var is_weapon_wheel_open: bool = false
+
 # Weapon constants
 const PISTOL = "pistol"
 const SHOTGUN = "shotgun"
@@ -70,11 +74,9 @@ func _physics_process(delta):
 		fire_weapon(right_weapon)
 			
 	# Weapon swtiching input
-	if Input.is_action_pressed("weapon_wheels"):
-		pass
-	else:
-		# We'll come back to this later
-		pass
+	if Input.is_action_just_pressed("weapon_wheels"):
+		is_weapon_wheel_open = !is_weapon_wheel_open
+		toggle_weapon_wheel()
 	
 	if Input.is_action_just_pressed("equip_pistols"):
 		switch_both_weapons(PISTOL)
@@ -156,6 +158,15 @@ func set_arm_z_index(leftIndex: int, rightIndex: int) -> void:
 # End Region
 # Region: Weapon Handling ------------------------------------------------------
 
+###
+# Toggle the weapon wheel
+###
+func toggle_weapon_wheel() -> void:
+	if !is_weapon_wheel_open:
+		var menu = weapon_wheel.instance()
+		add_child(menu)
+	elif $WeaponWheel != null:
+		$WeaponWheel.queue_free()
 ###
 # Handle firing a weapon
 ###
